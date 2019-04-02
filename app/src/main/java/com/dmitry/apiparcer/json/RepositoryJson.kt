@@ -2,7 +2,7 @@ package com.dmitry.apiparcer.json
 
 import com.google.gson.annotations.SerializedName
 
-data class RepositoryJsonModel(
+data class RepositoryJson(
     @SerializedName("archive_url")
     val archiveUrl: String,
 
@@ -106,7 +106,7 @@ data class RepositoryJsonModel(
     val notificationsUrl: String,
 
     @SerializedName("owner")
-    val owner: OwnerJsonModel,
+    val owner: OwnerJson,
 
     @SerializedName("private")
     val isPrivate: Boolean,
