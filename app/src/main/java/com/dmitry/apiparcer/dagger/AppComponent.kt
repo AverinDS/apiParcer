@@ -3,6 +3,7 @@ package com.dmitry.apiparcer.dagger
 import com.dmitry.apiparcer.App
 import com.dmitry.apiparcer.Navigator
 import com.dmitry.apiparcer.container_activity.ContainerPresenter
+import com.dmitry.apiparcer.fragments.all_repositories_fragment.AllRepositoriesFragment
 import dagger.Component
 import javax.inject.Singleton
 
@@ -10,6 +11,7 @@ import javax.inject.Singleton
 @Component(modules = [AppModule::class, PresentersModule::class, NetworkModule::class])
 interface AppComponent {
     fun inject(app: App)
+    fun inject(allRepositoriesFragment: AllRepositoriesFragment)
     fun getNavigator(): Navigator
     fun getContainerPresenter(): ContainerPresenter
 }

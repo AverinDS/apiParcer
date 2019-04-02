@@ -3,6 +3,7 @@ package com.dmitry.apiparcer.container_activity
 import android.os.Bundle
 import com.dmitry.apiparcer.App
 import com.dmitry.apiparcer.R
+import com.dmitry.apiparcer.app
 import com.hannesdorfmann.mosby3.mvi.MviActivity
 import io.reactivex.Observable
 import kotlinx.android.synthetic.main.activity_container.*
@@ -22,7 +23,7 @@ class ContainerActivity : MviActivity<ContainerView, ContainerPresenter>(), Cont
     override fun createPresenter(): ContainerPresenter {
         val navigator = (application as App).component.getNavigator()
         navigator.initialize(supportFragmentManager)
-        return (application as App).component.getContainerPresenter()
+        return app.component.getContainerPresenter()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
