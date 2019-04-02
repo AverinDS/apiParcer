@@ -6,12 +6,8 @@ import com.dmitry.apiparcer.R
 import com.hannesdorfmann.mosby3.mvi.MviActivity
 import io.reactivex.Observable
 import kotlinx.android.synthetic.main.activity_container.*
-import javax.inject.Inject
 
 class ContainerActivity : MviActivity<ContainerView, ContainerPresenter>(), ContainerView {
-
-    @Inject
-    lateinit var presenter: ContainerPresenter
 
     override fun loadingIntent(): Observable<Unit> {
         return Observable.just(Unit)
@@ -24,8 +20,9 @@ class ContainerActivity : MviActivity<ContainerView, ContainerPresenter>(), Cont
     }
 
     override fun createPresenter(): ContainerPresenter {
-        (application as App).component.inject(this)
-        return presenter
+        val navigator = (application as App).component.getNavigator()
+        navigator.initialize(supportFragmentManager)
+        return (application as App).component.getContainerPresenter()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

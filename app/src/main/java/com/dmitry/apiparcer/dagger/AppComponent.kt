@@ -1,13 +1,15 @@
 package com.dmitry.apiparcer.dagger
 
 import com.dmitry.apiparcer.App
-import com.dmitry.apiparcer.container_activity.ContainerActivity
+import com.dmitry.apiparcer.Navigator
+import com.dmitry.apiparcer.container_activity.ContainerPresenter
 import dagger.Component
 import javax.inject.Singleton
 
 @Singleton
-@Component(modules = [AppModule::class, PresentersModule::class])
+@Component(modules = [AppModule::class, PresentersModule::class, NetworkModule::class])
 interface AppComponent {
     fun inject(app: App)
-    fun inject(containerActivity: ContainerActivity)
+    fun getNavigator(): Navigator
+    fun getContainerPresenter(): ContainerPresenter
 }
