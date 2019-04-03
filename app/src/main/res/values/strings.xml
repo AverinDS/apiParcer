@@ -1,3 +1,5 @@
 <resources>
-    <string name="app_name">apiparcer</string>
+	<string name="app_name">apiparcer</string>
+	<string name="star_description">Add to favourite repositories</string>
+	<string name="avatart_description">Avatar icon</string>
 </resources>

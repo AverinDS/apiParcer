@@ -1,5 +1,7 @@
 package com.dmitry.apiparcer.dagger
 
+import com.dmitry.apiparcer.GitHubApi
+import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import dagger.Module
 import dagger.Provides
 import okhttp3.OkHttpClient
@@ -33,7 +35,12 @@ class NetworkModule {
         return Retrofit.Builder()
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
+            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
             .baseUrl(BASE_URL)
             .build()
     }
+
+    @Provides
+    @Singleton
+    fun provideApi(retrofit: Retrofit): GitHubApi = retrofit.create(GitHubApi::class.java)
 }
