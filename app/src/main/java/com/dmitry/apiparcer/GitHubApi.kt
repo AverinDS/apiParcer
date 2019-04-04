@@ -5,6 +5,7 @@ import com.dmitry.apiparcer.json.ForkJson
 import com.dmitry.apiparcer.json.RepositoryJson
 import com.dmitry.apiparcer.json.StarGazersJson
 import io.reactivex.Observable
+import org.json.JSONObject
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -21,4 +22,7 @@ interface GitHubApi {
 
     @GET("{forksUrl}")
     fun getForks(@Path("forksUrl") forksUrl: String): Observable<List<ForkJson>>
+
+    @GET("{programLanguages}")
+    fun getProgramLanguages(@Path("programLanguages") languagesUrl: String): Observable<JSONObject>
 }

@@ -121,6 +121,9 @@ data class ForkJson(
     @SerializedName("issues_url")
     val issuesUrl: String,
 
+    @SerializedName("private")
+    val isPrivate: Boolean,
+
     @SerializedName("keys_url")
     val keysUrl: String,
 
@@ -162,9 +165,6 @@ data class ForkJson(
 
     @SerializedName("owner")
     val ownerJson: OwnerJson,
-
-    @SerializedName("private")
-    val `private`: Boolean,
 
     @SerializedName("pulls_url")
     val pullsUrl: String,

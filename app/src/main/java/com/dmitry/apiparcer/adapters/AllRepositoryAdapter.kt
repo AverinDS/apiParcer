@@ -5,10 +5,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.dmitry.apiparcer.R
-import com.dmitry.apiparcer.json.RepositoryJson
+import com.dmitry.apiparcer.repositories.Interactor
 import kotlinx.android.synthetic.main.item_repository.view.*
 
-class AllRepositoryAdapter(private val listRepositories: List<RepositoryJson>) :
+class AllRepositoryAdapter(private val listRepositories: List<Interactor.RepositoryData>) :
     RecyclerView.Adapter<AllRepositoryAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AllRepositoryAdapter.ViewHolder {

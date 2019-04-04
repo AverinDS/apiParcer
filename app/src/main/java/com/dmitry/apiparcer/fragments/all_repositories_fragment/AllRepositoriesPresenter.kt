@@ -1,18 +1,21 @@
 package com.dmitry.apiparcer.fragments.all_repositories_fragment
 
-import com.dmitry.apiparcer.repositories.NetworkRepository
+import com.dmitry.apiparcer.repositories.Interactor
 import com.hannesdorfmann.mosby3.mvi.MviBasePresenter
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 
+const val startId = 0
 class AllRepositoriesPresenter(
-    private val networkRepository: NetworkRepository
+    private val interactor: Interactor
 
 ) : MviBasePresenter<AllRepositoriesViewFragment, AllRepositoriesViewState>() {
 
     override fun bindIntents() {
+
         val loadingIntent = intent(AllRepositoriesViewFragment::loadingIntent)
-            .flatMap { networkRepository.requestRepositoriesSinceId(0) }
+            .flatMap { interactor.getRepositoriesDataSinceId(startId) }
+
             .observeOn(AndroidSchedulers.mainThread())
             .map { listRepositories -> AllRepositoriesViewState.LoadRepositories(listRepositories) as AllRepositoriesViewState }
 
@@ -26,5 +29,4 @@ class AllRepositoriesPresenter(
 
         subscribeViewState(allIntents, AllRepositoriesViewFragment::render)
     }
-
 }

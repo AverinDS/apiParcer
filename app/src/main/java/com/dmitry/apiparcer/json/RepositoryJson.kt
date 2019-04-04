@@ -37,7 +37,7 @@ data class RepositoryJson(
     val deploymentsUrl: String,
 
     @SerializedName("description")
-    val description: String,
+    val description: String?,
 
     @SerializedName("downloads_url")
     val downloadsUrl: String,
@@ -64,7 +64,7 @@ data class RepositoryJson(
     val gitTagsUrl: String,
 
     @SerializedName("git_url")
-    val gitUrl: String,
+    val gitUrl: String?,
 
     @SerializedName("html_url")
     val htmlUrl: String,
@@ -118,7 +118,7 @@ data class RepositoryJson(
     val releasesUrl: String,
 
     @SerializedName("ssh_url")
-    val sshUrl: String,
+    val sshUrl: String?,
 
     @SerializedName("stargazers_url")
     val stargazersUrl: String,

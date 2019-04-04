@@ -1,6 +1,8 @@
 package com.dmitry.apiparcer.dagger
 
 import com.dmitry.apiparcer.GitHubApi
+import com.dmitry.apiparcer.repositories.Interactor
+import com.dmitry.apiparcer.repositories.InteractorImpl
 import com.dmitry.apiparcer.repositories.NetworkRepository
 import com.dmitry.apiparcer.repositories.NetworkRepositoryImpl
 import dagger.Binds
@@ -15,9 +17,16 @@ class RepositoriesModule {
     @Singleton
     fun provideNetworkRepository(api: GitHubApi): NetworkRepositoryImpl = NetworkRepositoryImpl(api)
 
+    @Provides
+    @Singleton
+    fun provideInteractorImpl(networkRepository: NetworkRepository): InteractorImpl = InteractorImpl(networkRepository)
+
     @Module
     interface BindsModule {
         @Binds
         fun provideNetwork(networkRepository: NetworkRepositoryImpl): NetworkRepository
+
+        @Binds
+        fun provideInteractor(interactor: InteractorImpl): Interactor
     }
 }

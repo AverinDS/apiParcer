@@ -5,6 +5,7 @@ import com.dmitry.apiparcer.json.ForkJson
 import com.dmitry.apiparcer.json.RepositoryJson
 import com.dmitry.apiparcer.json.StarGazersJson
 import io.reactivex.Observable
+import org.json.JSONObject
 
 interface NetworkRepository {
     /**
@@ -27,5 +28,10 @@ interface NetworkRepository {
     /**
      * Request forks from url contains in [RepositoryJson] in forks_url
      */
-    fun requestForks(urlForks: String): Observable<List<ForkJson>>
+    fun requestForksFromUrl(urlForks: String): Observable<List<ForkJson>>
+
+    /**
+     * request programming language from url
+     */
+    fun requestLanguagesFromUrl(urlLanguage: String): Observable<JSONObject>
 }

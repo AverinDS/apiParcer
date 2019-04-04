@@ -1,5 +1,9 @@
 package com.dmitry.apiparcer.models
 
+import com.dmitry.apiparcer.json.RepositoryJson
+import com.dmitry.apiparcer.withoutShaArg
+import com.dmitry.apiparcer.withoutTopDomain
+
 data class RepositoryModel(
     val archiveUrl: String,
     val assigneesUrl: String,
@@ -48,4 +52,56 @@ data class RepositoryModel(
     val teamsUrl: String,
     val treesUrl: String,
     val url: String
-)
+) {
+    constructor(repositoryJson: RepositoryJson) : this(
+        archiveUrl = repositoryJson.archiveUrl,
+        assigneesUrl = repositoryJson.assigneesUrl,
+        blobsUrl = repositoryJson.blobsUrl,
+        branchesUrl = repositoryJson.branchesUrl,
+        collaboratorsUrl = repositoryJson.collaboratorsUrl,
+        commentsUrl = repositoryJson.commentsUrl,
+        commitsUrl = repositoryJson.commitsUrl.withoutShaArg,
+        compareUrl = repositoryJson.compareUrl,
+        contentsUrl = repositoryJson.contentsUrl,
+        contributorsUrl = repositoryJson.contributorsUrl,
+        deploymentsUrl = repositoryJson.deploymentsUrl,
+        description = repositoryJson.description ?: "",
+        downloadsUrl = repositoryJson.downloadsUrl,
+        eventsUrl = repositoryJson.eventsUrl,
+        fork = repositoryJson.fork,
+        forksUrl = repositoryJson.forksUrl.withoutTopDomain,
+        fullName = repositoryJson.fullName,
+        gitCommitsUrl = repositoryJson.gitCommitsUrl.withoutShaArg,
+        gitRefsUrl = repositoryJson.gitRefsUrl,
+        gitTagsUrl = repositoryJson.gitTagsUrl,
+        gitUrl = repositoryJson.gitUrl ?: "",
+        htmlUrl = repositoryJson.htmlUrl,
+        id = repositoryJson.id,
+        issueCommentUrl = repositoryJson.issueCommentUrl,
+        issueEventsUrl = repositoryJson.issueEventsUrl,
+        issuesUrl = repositoryJson.issuesUrl,
+        keysUrl = repositoryJson.keysUrl,
+        labelsUrl = repositoryJson.labelsUrl,
+        languagesUrl = repositoryJson.languagesUrl.withoutTopDomain,
+        mergesUrl = repositoryJson.mergesUrl,
+        milestonesUrl = repositoryJson.milestonesUrl,
+        name = repositoryJson.name,
+        nodeId = repositoryJson.nodeId,
+        notificationsUrl = repositoryJson.notificationsUrl,
+        owner = OwnerModel(repositoryJson.owner), //need replace with idOwner
+        isPrivate = repositoryJson.isPrivate,
+        pullsUrl = repositoryJson.pullsUrl,
+        releasesUrl = repositoryJson.releasesUrl,
+        sshUrl = repositoryJson.sshUrl ?: "",
+        stargazersUrl = repositoryJson.stargazersUrl.withoutTopDomain,
+        statusesUrl = repositoryJson.statusesUrl,
+        subscribersUrl = repositoryJson.subscribersUrl,
+        subscriptionUrl = repositoryJson.subscriptionUrl,
+        tagsUrl = repositoryJson.tagsUrl,
+        teamsUrl = repositoryJson.teamsUrl,
+        treesUrl = repositoryJson.treesUrl,
+        url = repositoryJson.url
+
+    )
+}
+
