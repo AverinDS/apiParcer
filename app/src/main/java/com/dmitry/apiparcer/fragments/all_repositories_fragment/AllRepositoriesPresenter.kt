@@ -15,9 +15,9 @@ class AllRepositoriesPresenter(
 
         val loadingIntent = intent(AllRepositoriesViewFragment::loadingIntent)
             .flatMap { interactor.getRepositoriesDataSinceId(startId) }
-
             .observeOn(AndroidSchedulers.mainThread())
             .map { listRepositories -> AllRepositoriesViewState.LoadRepositories(listRepositories) as AllRepositoriesViewState }
+            .startWith(AllRepositoriesViewState.Loading)
 
         val goToUpIntent = intent(AllRepositoriesViewFragment::goToUp)
             .map { AllRepositoriesViewState.Error("not implemented") as AllRepositoriesViewState }

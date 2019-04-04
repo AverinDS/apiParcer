@@ -5,6 +5,7 @@ import android.support.v7.widget.LinearLayoutManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import com.dmitry.apiparcer.R
 import com.dmitry.apiparcer.adapters.AllRepositoryAdapter
 import com.dmitry.apiparcer.app
@@ -16,6 +17,9 @@ import javax.inject.Inject
 
 class AllRepositoriesFragment : MviFragment<AllRepositoriesViewFragment, AllRepositoriesPresenter>(),
     AllRepositoriesViewFragment {
+
+    @Inject
+    lateinit var presenter: AllRepositoriesPresenter
 
     private val loadNextRepositories: PublishSubject<Int> = PublishSubject.create()
     private val goToUpRepositories: PublishSubject<Unit> = PublishSubject.create()
@@ -33,14 +37,35 @@ class AllRepositoriesFragment : MviFragment<AllRepositoriesViewFragment, AllRepo
     override fun goToUp(): Observable<Unit> = goToUpRepositories
 
     override fun render(state: AllRepositoriesViewState) {
-        if (state is AllRepositoriesViewState.LoadRepositories) {
-            recycleView.layoutManager = LinearLayoutManager(this.context)
-            recycleView.adapter = AllRepositoryAdapter(state.repositoryModels)
+        when (state) {
+            is AllRepositoriesViewState.LoadRepositories -> {
+                progressBar.visibility = View.GONE
+
+                recycleView.apply {
+                    visibility = View.VISIBLE
+                    layoutManager = LinearLayoutManager(this.context)
+
+                    if (adapter == null) {
+                        adapter = AllRepositoryAdapter(state.repositoryModels)
+                    } else {
+                        (adapter as AllRepositoryAdapter).let {
+                            val lastIndex = it.getLastIndex()
+                            it.addItems(state.repositoryModels)
+                            it.notifyItemRangeInserted(lastIndex, state.repositoryModels.count())
+                        }
+                    }
+                }
+            }
+            is Error -> {
+                progressBar.visibility = View.GONE
+                Toast.makeText(this.context, state.message, Toast.LENGTH_LONG).show()
+            }
+            is AllRepositoriesViewState.Loading -> {
+                progressBar.visibility = View.VISIBLE
+                recycleView.visibility = View.INVISIBLE
+            }
         }
     }
-
-    @Inject
-    lateinit var presenter: AllRepositoriesPresenter
 
     override fun createPresenter(): AllRepositoriesPresenter {
         activity?.app?.component?.inject(this)

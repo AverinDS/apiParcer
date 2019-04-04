@@ -17,6 +17,8 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
         buildConfigField("String", "BASE_URL", '"https://api.github.com/"')
+        buildConfigField("String", "CLIENT_KEY", '"a3a68d7ab6bbc082a88e"')
+        buildConfigField("String", "CLIENT_SECRET_KEY", '"7ca228c5eac61834434e31ac778a58cd0d3ba32c"')
     }
     buildTypes {
         release {
@@ -77,4 +79,7 @@ dependencies {
 
 //    gson
     implementation 'com.google.code.gson:gson:2.8.5'
+
+//    picasso
+    implementation 'com.squareup.picasso:picasso:2.71828'
 }

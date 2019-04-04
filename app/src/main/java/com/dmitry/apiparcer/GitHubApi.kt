@@ -12,17 +12,37 @@ import retrofit2.http.Query
 
 interface GitHubApi {
     @GET("repositories")
-    fun getPublicRepositoriesSince(@Query("since") lastRepositoryId: Int): Observable<List<RepositoryJson>>
+    fun getPublicRepositoriesSince(
+        @Query("since") lastRepositoryId: Int,
+        @Query("client_id") clientId: String,
+        @Query("client_secret") clientSecret: String
+    ): Observable<List<RepositoryJson>>
 
     @GET("{commitsUrl}")
-    fun getCommits(@Path("commitsUrl") commitsUrl: String): Observable<List<CommitJson>>
+    fun getCommits(
+        @Path("commitsUrl") commitsUrl: String,
+        @Query("client_id") clientId: String,
+        @Query("client_secret") clientSecret: String
+    ): Observable<List<CommitJson>>
 
     @GET("{starGazersUrl}")
-    fun getStarGazers(@Path("starGazersUrl") starGazersUrl: String): Observable<List<StarGazersJson>>
+    fun getStarGazers(
+        @Path("starGazersUrl") starGazersUrl: String,
+        @Query("client_id") clientId: String,
+        @Query("client_secret") clientSecret: String
+    ): Observable<List<StarGazersJson>>
 
     @GET("{forksUrl}")
-    fun getForks(@Path("forksUrl") forksUrl: String): Observable<List<ForkJson>>
+    fun getForks(
+        @Path("forksUrl") forksUrl: String,
+        @Query("client_id") clientId: String,
+        @Query("client_secret") clientSecret: String
+    ): Observable<List<ForkJson>>
 
     @GET("{programLanguages}")
-    fun getProgramLanguages(@Path("programLanguages") languagesUrl: String): Observable<JSONObject>
+    fun getProgramLanguages(
+        @Path("programLanguages") languagesUrl: String,
+        @Query("client_id") clientId: String,
+        @Query("client_secret") clientSecret: String
+    ): Observable<JSONObject>
 }

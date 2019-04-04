@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.dmitry.apiparcer.R
 import com.dmitry.apiparcer.repositories.Interactor
+import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.item_repository.view.*
 
 class AllRepositoryAdapter(private val listRepositories: List<Interactor.RepositoryData>) :
@@ -20,6 +21,15 @@ class AllRepositoryAdapter(private val listRepositories: List<Interactor.Reposit
     override fun onBindViewHolder(holder: AllRepositoryAdapter.ViewHolder, position: Int) {
         holder.mainText.text = listRepositories[position].name
         holder.secondaryText.text = listRepositories[position].owner.login
+        Picasso.get().load(listRepositories[position].owner.avatarUrl).into(holder.iconAvatar)
+    }
+
+    fun addItems(newItems: List<Interactor.RepositoryData>) {
+        listRepositories.plus(newItems)
+    }
+
+    fun getLastIndex(): Int {
+        return listRepositories.lastIndex
     }
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {

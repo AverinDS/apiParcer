@@ -13,6 +13,7 @@ class InteractorImpl(
     override fun getRepositoriesDataSinceId(latestRepositoryId: Int): Observable<List<Interactor.RepositoryData>> {
         return networkRepository
             .requestRepositoriesSinceId(latestRepositoryId)
+            .map { it.take(5) }//TODO:DEBUG
             .map { listRepositoryJson ->
                 listRepositoryJson.map { RepositoryModel(it) }
             }
