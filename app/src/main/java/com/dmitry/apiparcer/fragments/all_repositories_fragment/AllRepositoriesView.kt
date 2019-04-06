@@ -29,5 +29,5 @@ interface AllRepositoriesView : MvpView {
     /**
      * render state
      */
-    fun render(state: AllRepositoriesViewState)
+    fun render(state: GeneralAllRepositoriesViewState)
 }

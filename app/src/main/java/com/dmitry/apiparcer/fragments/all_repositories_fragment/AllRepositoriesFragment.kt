@@ -5,7 +5,6 @@ import android.support.v7.widget.LinearLayoutManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import com.dmitry.apiparcer.R
 import com.dmitry.apiparcer.adapters.AllRepositoryAdapter
 import com.dmitry.apiparcer.app
@@ -37,38 +36,33 @@ class AllRepositoriesFragment : MviFragment<AllRepositoriesView, AllRepositories
 
     override fun goToUp(): Observable<Unit> = goToUpRepositories
 
-    override fun render(state: AllRepositoriesViewState) {
-        when (state) {
-            is AllRepositoriesViewState.LoadRepositories -> {
-                progressBar.visibility = View.GONE
+    override fun render(state: GeneralAllRepositoriesViewState) {
+        progressBar.visibility = if (state.isLoading) {
+            View.VISIBLE
+        } else {
+            View.GONE
+        }
 
-                recycleView.apply {
-                    visibility = View.VISIBLE
-                    layoutManager = LinearLayoutManager(this.context)
+        recycleView.apply {
+            visibility = if (state.isLoading || state.error.isNotEmpty()) {
+                View.GONE
+            } else {
+                View.VISIBLE
+            }
+            layoutManager = LinearLayoutManager(this.context)
 
-                    if (adapter == null) {
-                        adapter = AllRepositoryAdapter(goToDetails, state.repositoryModels)
-                    } else {
-                        (adapter as AllRepositoryAdapter).let {
-                            val lastIndex = it.getLastIndex()
-                            it.addItems(state.repositoryModels)
-                            it.notifyItemRangeInserted(lastIndex, state.repositoryModels.count())
-                        }
+            if (adapter == null) {
+                adapter = AllRepositoryAdapter(goToDetails, emptyList())
+            } else {
+
+                if (state.containsNewData) {
+                    (adapter as AllRepositoryAdapter).let {
+                        val lastIndex = it.getLastIndex()
+                        val changerange = state.repositoryModels.count() - it.itemCount
+                        it.addItems(state.repositoryModels)
+                        it.notifyItemRangeInserted(lastIndex, changerange)
                     }
                 }
-                isRestoringViewState = true
-            }
-            is Error -> {
-                progressBar.visibility = View.GONE
-                Toast.makeText(this.context, state.message, Toast.LENGTH_LONG).show()
-                isRestoringViewState = true
-            }
-            is AllRepositoriesViewState.Loading -> {
-                progressBar.visibility = View.VISIBLE
-                recycleView.visibility = View.INVISIBLE
-            }
-            is AllRepositoriesViewState.GoToDetails -> {
-                isRestoringViewState = false
             }
         }
     }
@@ -77,5 +71,4 @@ class AllRepositoriesFragment : MviFragment<AllRepositoriesView, AllRepositories
         activity?.app?.component?.inject(this)
         return presenter
     }
-
 }

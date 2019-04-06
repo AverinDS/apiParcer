@@ -11,7 +11,7 @@ const val startId = 0
 class AllRepositoriesPresenter(
     private val interactor: Interactor,
     private var showDetailsRepository: ((dataRepository: Interactor.RepositoryData) -> Unit)?
-) : MviBasePresenter<AllRepositoriesView, AllRepositoriesViewState>() {
+) : MviBasePresenter<AllRepositoriesView, GeneralAllRepositoriesViewState>() {
 
     private val disposables = CompositeDisposable()
 
@@ -20,29 +20,65 @@ class AllRepositoriesPresenter(
         val loadingIntent = intent(AllRepositoriesView::loadingIntent)
             .flatMap { interactor.getRepositoriesDataSinceId(startId) }
             .observeOn(AndroidSchedulers.mainThread())
-            .map { listRepositories -> AllRepositoriesViewState.LoadRepositories(listRepositories) as AllRepositoriesViewState }
-            .startWith(AllRepositoriesViewState.Loading)
-            .onErrorReturn { AllRepositoriesViewState.Error(it.localizedMessage) }
+            .map { listRepositories -> PartAllRepositoriesViewState.LoadRepositories(listRepositories) as PartAllRepositoriesViewState }
+            .startWith(PartAllRepositoriesViewState.Loading)
+            .onErrorReturn { PartAllRepositoriesViewState.Error(it.localizedMessage) }
 
         val goToUpIntent = intent(AllRepositoriesView::goToUp)
-            .map { AllRepositoriesViewState.Error("not implemented") as AllRepositoriesViewState }
+            .map { PartAllRepositoriesViewState.Error("not implemented") as PartAllRepositoriesViewState }
 
         val loadNext = intent(AllRepositoriesView::loadNext)
-            .map { AllRepositoriesViewState.Error("not implemented") as AllRepositoriesViewState }
+            .map { PartAllRepositoriesViewState.Error("not implemented") as PartAllRepositoriesViewState }
 
         val goToDetails = intent(AllRepositoriesView::goToDetails)
-            .map { AllRepositoriesViewState.GoToDetails(it) }
+            .map { PartAllRepositoriesViewState.GoToDetails(it) as PartAllRepositoriesViewState }
 
         val allIntents = Observable.merge(listOf(loadingIntent, goToUpIntent, loadNext, goToDetails)).share()
 
         disposables.add(
             allIntents
-                .filter { it is AllRepositoriesViewState.GoToDetails }
-                .map { state -> state as AllRepositoriesViewState.GoToDetails }
+                .filter { it is PartAllRepositoriesViewState.GoToDetails }
+                .map { state -> state as PartAllRepositoriesViewState.GoToDetails }
                 .subscribe { state -> showDetailsRepository?.invoke(state.repositoryData) }
         )
 
-        subscribeViewState(allIntents, AllRepositoriesView::render)
+        val initialState = GeneralAllRepositoriesViewState(
+            isLoading = true,
+            error = "",
+            repositoryModels = emptyList(),
+            containsNewData = true
+        )
+        val stateObservable: Observable<GeneralAllRepositoriesViewState> =
+            allIntents.scan(initialState, this::viewStateReducer)
+        subscribeViewState(stateObservable, AllRepositoriesView::render)
+    }
+
+    private fun viewStateReducer(
+        previousState: GeneralAllRepositoriesViewState,
+        changes: PartAllRepositoriesViewState
+    ): GeneralAllRepositoriesViewState {
+        return when (changes) {
+            is PartAllRepositoriesViewState.Error -> {
+                previousState.copy(
+                    error = changes.message,
+                    isLoading = false,
+                    repositoryModels = emptyList(),
+                    containsNewData = false
+                )
+            }
+            is PartAllRepositoriesViewState.LoadRepositories -> {
+                previousState.copy(
+                    error = "",
+                    isLoading = false,
+                    repositoryModels = previousState.repositoryModels + changes.repositoryModels,
+                    containsNewData = true
+                )
+            }
+            is PartAllRepositoriesViewState.Loading -> {
+                previousState.copy(error = "", isLoading = true, repositoryModels = emptyList(), containsNewData = true)
+            }
+            else -> previousState.copy(containsNewData = false)
+        }
     }
 
     override fun unbindIntents() {

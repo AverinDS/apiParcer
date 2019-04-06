@@ -13,7 +13,7 @@ import kotlinx.android.synthetic.main.item_repository.view.*
 
 class AllRepositoryAdapter(
     private val goToDetails: PublishSubject<Interactor.RepositoryData>,
-    private val listRepositories: List<Interactor.RepositoryData>
+    private var listRepositories: List<Interactor.RepositoryData>
 ) :
     RecyclerView.Adapter<AllRepositoryAdapter.ViewHolder>() {
 
@@ -35,7 +35,11 @@ class AllRepositoryAdapter(
             context.getString(R.string.commits_count_template, listRepositories[position].commits.size)
         holder.descriptionText.text =
             context.getString(R.string.description_template, listRepositories[position].description)
-        Picasso.get().load(listRepositories[position].owner.avatarUrl).into(holder.iconAvatar)
+        listRepositories[position].owner.avatarUrl.let { url ->
+            if (url.isNotEmpty()) {
+                Picasso.get().load(url).into(holder.iconAvatar)
+            }
+        }
     }
 
     override fun getItemCount(): Int = listRepositories.size
@@ -66,11 +70,15 @@ class AllRepositoryAdapter(
     }
 
     fun addItems(newItems: List<Interactor.RepositoryData>) {
-        listRepositories.plus(newItems)
+        listRepositories += newItems
     }
 
     fun getLastIndex(): Int {
-        return listRepositories.lastIndex
+        return if (listRepositories.lastIndex == -1) {
+            0
+        } else {
+            listRepositories.lastIndex
+        }
     }
 
     private fun getLanguagesAsString(languages: List<String>): String {
