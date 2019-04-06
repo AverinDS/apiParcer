@@ -2,9 +2,11 @@ package com.dmitry.apiparcer.repositories
 
 import android.util.Log
 import com.dmitry.apiparcer.models.RepositoryModel
+import com.google.gson.JsonObject
 import io.reactivex.Observable
 import io.reactivex.functions.Function4
-import org.json.JSONObject
+
+const val MAX_COMMITS_COUNT = 10
 
 class InteractorImpl(
     private val networkRepository: NetworkRepository
@@ -32,13 +34,17 @@ class InteractorImpl(
     }
 
     private fun convertToRepositoryData(repositoryModel: RepositoryModel): Observable<Interactor.RepositoryData> {
-        val requestLanguages =
-            networkRepository.requestLanguagesFromUrl(repositoryModel.languagesUrl).onErrorReturn { JSONObject() }
-        val requestCommits =
-            networkRepository.requestCommitsFromUrl(repositoryModel.commitsUrl).onErrorReturn { emptyList() }
-        val requestForks = networkRepository.requestForksFromUrl(repositoryModel.forksUrl).onErrorReturn { emptyList() }
-        val requestStars =
-            networkRepository.requestStarGazers(repositoryModel.stargazersUrl).onErrorReturn { emptyList() }
+        val requestLanguages = networkRepository.requestLanguagesFromUrl(repositoryModel.languagesUrl)
+            .onErrorReturn { JsonObject() }
+
+        val requestCommits = networkRepository.requestCommitsFromUrl(repositoryModel.commitsUrl)
+            .onErrorReturn { emptyList() }
+
+        val requestForks = networkRepository.requestForksFromUrl(repositoryModel.forksUrl)
+            .onErrorReturn { emptyList() }
+
+        val requestStars = networkRepository.requestStarGazers(repositoryModel.stargazersUrl)
+            .onErrorReturn { emptyList() }
 
         return Observable.zip(
             requestLanguages,
@@ -52,10 +58,12 @@ class InteractorImpl(
                     forksCount = listForks.count(),
                     starCount = listStarGazers.count(),
                     owner = OwnerDataImpl(repositoryModel.owner.avatarUrl, repositoryModel.owner.login),
-                    commits = listCommits.map {
-                        CommitDataImpl(it.author.name, it.message, it.message)
-                    },
-                    languages = listOf(languagesJson.keys().toString())
+                    commits = listCommits
+                        .take(MAX_COMMITS_COUNT)
+                        .map {
+                            CommitDataImpl(it.commit.author.name, it.commit.message, it.commit.committer.name)
+                        },
+                    languages = languagesJson.keySet().toList()
                 )
             })
     }

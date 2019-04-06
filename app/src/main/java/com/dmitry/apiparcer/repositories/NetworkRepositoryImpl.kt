@@ -2,16 +2,16 @@ package com.dmitry.apiparcer.repositories
 
 import com.dmitry.apiparcer.BuildConfig
 import com.dmitry.apiparcer.GitHubApi
-import com.dmitry.apiparcer.json.CommitJson
+import com.dmitry.apiparcer.json.ExtendedCommitJson
 import com.dmitry.apiparcer.json.ForkJson
 import com.dmitry.apiparcer.json.RepositoryJson
 import com.dmitry.apiparcer.json.StarGazersJson
+import com.google.gson.JsonObject
 import io.reactivex.Observable
 import io.reactivex.schedulers.Schedulers
-import org.json.JSONObject
 
 class NetworkRepositoryImpl(private val api: GitHubApi) : NetworkRepository {
-    override fun requestLanguagesFromUrl(urlLanguage: String): Observable<JSONObject> {
+    override fun requestLanguagesFromUrl(urlLanguage: String): Observable<JsonObject> {
         return api.getProgramLanguages(urlLanguage, BuildConfig.CLIENT_KEY, BuildConfig.CLIENT_SECRET_KEY)
     }
 
@@ -25,7 +25,7 @@ class NetworkRepositoryImpl(private val api: GitHubApi) : NetworkRepository {
             .subscribeOn(Schedulers.io())
     }
 
-    override fun requestCommitsFromUrl(urlCommits: String): Observable<List<CommitJson>> {
+    override fun requestCommitsFromUrl(urlCommits: String): Observable<List<ExtendedCommitJson>> {
         return api.getCommits(urlCommits, BuildConfig.CLIENT_KEY, BuildConfig.CLIENT_SECRET_KEY)
             .subscribeOn(Schedulers.io())
     }

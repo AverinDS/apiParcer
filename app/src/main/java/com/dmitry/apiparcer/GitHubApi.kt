@@ -1,14 +1,14 @@
 package com.dmitry.apiparcer
 
-import com.dmitry.apiparcer.json.CommitJson
+import com.dmitry.apiparcer.json.ExtendedCommitJson
 import com.dmitry.apiparcer.json.ForkJson
 import com.dmitry.apiparcer.json.RepositoryJson
 import com.dmitry.apiparcer.json.StarGazersJson
+import com.google.gson.JsonObject
 import io.reactivex.Observable
-import org.json.JSONObject
 import retrofit2.http.GET
-import retrofit2.http.Path
 import retrofit2.http.Query
+import retrofit2.http.Url
 
 interface GitHubApi {
     @GET("repositories")
@@ -18,31 +18,31 @@ interface GitHubApi {
         @Query("client_secret") clientSecret: String
     ): Observable<List<RepositoryJson>>
 
-    @GET("{commitsUrl}")
+    @GET
     fun getCommits(
-        @Path("commitsUrl") commitsUrl: String,
+        @Url commitsUrl: String,
         @Query("client_id") clientId: String,
         @Query("client_secret") clientSecret: String
-    ): Observable<List<CommitJson>>
+    ): Observable<List<ExtendedCommitJson>>
 
-    @GET("{starGazersUrl}")
+    @GET
     fun getStarGazers(
-        @Path("starGazersUrl") starGazersUrl: String,
+        @Url starGazersUrl: String,
         @Query("client_id") clientId: String,
         @Query("client_secret") clientSecret: String
     ): Observable<List<StarGazersJson>>
 
-    @GET("{forksUrl}")
+    @GET
     fun getForks(
-        @Path("forksUrl") forksUrl: String,
+        @Url forksUrl: String,
         @Query("client_id") clientId: String,
         @Query("client_secret") clientSecret: String
     ): Observable<List<ForkJson>>
 
-    @GET("{programLanguages}")
+    @GET
     fun getProgramLanguages(
-        @Path("programLanguages") languagesUrl: String,
+        @Url languagesUrl: String,
         @Query("client_id") clientId: String,
         @Query("client_secret") clientSecret: String
-    ): Observable<JSONObject>
+    ): Observable<JsonObject>
 }

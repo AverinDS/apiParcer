@@ -1,5 +1,11 @@
 <resources>
 	<string name="app_name">apiparcer</string>
 	<string name="star_description">Add to favourite repositories</string>
-	<string name="avatart_description">Avatar icon</string>
+	<string name="avatar_description">Avatar icon</string>
+	<string name="forks_template">Forks: %d</string>
+	<string name="star_template">Stars: %d</string>
+	<string name="author_template">Author: %s \n</string>
+	<string name="description_template">Description:\n %s</string>
+	<string name="commits_template">Commit title:\n%s\n\n</string>
+	<string name="languages_template">Languages:\n%s</string>
 </resources>

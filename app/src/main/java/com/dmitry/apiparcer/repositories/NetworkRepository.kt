@@ -1,11 +1,11 @@
 package com.dmitry.apiparcer.repositories
 
-import com.dmitry.apiparcer.json.CommitJson
+import com.dmitry.apiparcer.json.ExtendedCommitJson
 import com.dmitry.apiparcer.json.ForkJson
 import com.dmitry.apiparcer.json.RepositoryJson
 import com.dmitry.apiparcer.json.StarGazersJson
+import com.google.gson.JsonObject
 import io.reactivex.Observable
-import org.json.JSONObject
 
 interface NetworkRepository {
     /**
@@ -18,7 +18,7 @@ interface NetworkRepository {
     /**
      * Request commits from url contains in [RepositoryJson] in field commits_url
      */
-    fun requestCommitsFromUrl(urlCommits: String): Observable<List<CommitJson>>
+    fun requestCommitsFromUrl(urlCommits: String): Observable<List<ExtendedCommitJson>>
 
     /**
      * Request starGazers from url contains in [RepositoryJson] in stargazers_url
@@ -33,5 +33,5 @@ interface NetworkRepository {
     /**
      * request programming language from url
      */
-    fun requestLanguagesFromUrl(urlLanguage: String): Observable<JSONObject>
+    fun requestLanguagesFromUrl(urlLanguage: String): Observable<JsonObject>
 }

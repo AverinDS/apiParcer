@@ -19,4 +19,7 @@
 
 	<dimen name="rv_item_icon_size">24dp</dimen>
 	<dimen name="rv_item_icon_padding_up">26dp</dimen>
+
+	<dimen name="expandable_item_list_border">8dp</dimen>
+	<dimen name="expandable_item_list_item_height">32dp</dimen>
 </resources>
