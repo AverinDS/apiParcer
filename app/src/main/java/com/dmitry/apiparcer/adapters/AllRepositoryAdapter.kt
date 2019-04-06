@@ -8,9 +8,13 @@ import android.view.ViewGroup
 import com.dmitry.apiparcer.R
 import com.dmitry.apiparcer.repositories.Interactor
 import com.squareup.picasso.Picasso
+import io.reactivex.subjects.PublishSubject
 import kotlinx.android.synthetic.main.item_repository.view.*
 
-class AllRepositoryAdapter(private val listRepositories: List<Interactor.RepositoryData>) :
+class AllRepositoryAdapter(
+    private val goToDetails: PublishSubject<Interactor.RepositoryData>,
+    private val listRepositories: List<Interactor.RepositoryData>
+) :
     RecyclerView.Adapter<AllRepositoryAdapter.ViewHolder>() {
 
     lateinit var context: Context
@@ -37,6 +41,7 @@ class AllRepositoryAdapter(private val listRepositories: List<Interactor.Reposit
 
     override fun onViewAttachedToWindow(holder: ViewHolder) {
         super.onViewAttachedToWindow(holder)
+
         holder.bodyItem.setOnClickListener {
             holder.expandedView.let { expandableView ->
                 if (expandableView.isExpanded) {
@@ -46,11 +51,17 @@ class AllRepositoryAdapter(private val listRepositories: List<Interactor.Reposit
                 }
             }
         }
+
+        holder.bodyItem.setOnLongClickListener {
+            goToDetails.onNext(listRepositories[holder.adapterPosition])
+            true
+        }
     }
 
     override fun onViewDetachedFromWindow(holder: ViewHolder) {
         super.onViewDetachedFromWindow(holder)
         holder.bodyItem.setOnClickListener(null)
+        holder.bodyItem.setOnLongClickListener(null)
     }
 
     fun addItems(newItems: List<Interactor.RepositoryData>) {
