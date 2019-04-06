@@ -23,6 +23,6 @@ class PresentersModule {
 
     @Provides
     @Singleton
-    fun provideDetailsRepositoryPresenter(): DetailsRepositoryDialogPresenter = DetailsRepositoryDialogPresenter()
-
+    fun provideDetailsRepositoryPresenter(navigator: Navigator): DetailsRepositoryDialogPresenter =
+        DetailsRepositoryDialogPresenter(navigator::popBackStack)
 }

@@ -10,6 +10,11 @@ interface DetailsRepositoryDialogView : MvpView {
     fun loadingIntent(): Observable<Unit>
 
     /**
+     * when arguments was picked
+     */
+    fun argumentsPicked(): Observable<List<AuthorCommit>>
+
+    /**
      * close this view
      */
     fun closingIntent(): Observable<Unit>
@@ -18,4 +23,10 @@ interface DetailsRepositoryDialogView : MvpView {
      * render state to view
      */
     fun render(state: DetailsRepositoryDialogViewState)
+
+    data class AuthorCommit(
+        val author: String,
+        val commit: String
+    )
+
 }

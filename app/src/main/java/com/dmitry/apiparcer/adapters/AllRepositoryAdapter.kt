@@ -31,7 +31,8 @@ class AllRepositoryAdapter(
         holder.starCountText.text = context.getString(R.string.star_template, listRepositories[position].starCount)
         holder.languageText.text =
             context.getString(R.string.languages_template, getLanguagesAsString(listRepositories[position].languages))
-        holder.commitsText.text = getCommitsInfoString(listRepositories[position].commits)
+        holder.commitsText.text =
+            context.getString(R.string.commits_count_template, listRepositories[position].commits.size)
         holder.descriptionText.text =
             context.getString(R.string.description_template, listRepositories[position].description)
         Picasso.get().load(listRepositories[position].owner.avatarUrl).into(holder.iconAvatar)
@@ -81,31 +82,6 @@ class AllRepositoryAdapter(
             }
         }
         return stringBuilder.toString()
-    }
-
-    private fun getCommitsInfoString(commits: List<Interactor.CommitData>): String {
-        val stringBuilder = StringBuilder()
-        for (commit in commits) {
-            stringBuilder
-                .append(context.getString(R.string.author_template, commit.commiter))
-                .append(
-                    context.getString(
-                        R.string.commits_template,
-                        getCommitTitle(commit.commitMessage)
-                    )
-                )
-
-        }
-        return stringBuilder.toString()
-    }
-
-    private fun getCommitTitle(commitMessage: String): String {
-        val indexOfNewLine = commitMessage.indexOf("\n")
-        return if (indexOfNewLine == -1) {
-            commitMessage
-        } else {
-            commitMessage.substring(0, indexOfNewLine)
-        }
     }
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {

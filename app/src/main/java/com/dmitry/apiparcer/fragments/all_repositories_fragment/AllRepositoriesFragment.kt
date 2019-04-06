@@ -56,17 +56,19 @@ class AllRepositoriesFragment : MviFragment<AllRepositoriesView, AllRepositories
                         }
                     }
                 }
+                isRestoringViewState = true
             }
             is Error -> {
                 progressBar.visibility = View.GONE
                 Toast.makeText(this.context, state.message, Toast.LENGTH_LONG).show()
+                isRestoringViewState = true
             }
             is AllRepositoriesViewState.Loading -> {
                 progressBar.visibility = View.VISIBLE
                 recycleView.visibility = View.INVISIBLE
             }
-            else -> {
-
+            is AllRepositoriesViewState.GoToDetails -> {
+                isRestoringViewState = false
             }
         }
     }

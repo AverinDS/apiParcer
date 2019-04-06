@@ -6,6 +6,6 @@
 	<string name="star_template">Stars: %d</string>
 	<string name="author_template">Author: %s \n</string>
 	<string name="description_template">Description:\n %s</string>
-	<string name="commits_template">Commit title:\n%s\n\n</string>
+	<string name="commits_count_template">Commits: %d\n</string>
 	<string name="languages_template">Languages:\n%s</string>
 </resources>

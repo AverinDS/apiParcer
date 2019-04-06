@@ -6,8 +6,6 @@ import com.google.gson.JsonObject
 import io.reactivex.Observable
 import io.reactivex.functions.Function4
 
-const val MAX_COMMITS_COUNT = 10
-
 class InteractorImpl(
     private val networkRepository: NetworkRepository
 ) : Interactor {
@@ -59,7 +57,6 @@ class InteractorImpl(
                     starCount = listStarGazers.count(),
                     owner = OwnerDataImpl(repositoryModel.owner.avatarUrl, repositoryModel.owner.login),
                     commits = listCommits
-                        .take(MAX_COMMITS_COUNT)
                         .map {
                             CommitDataImpl(it.commit.author.name, it.commit.message, it.commit.committer.name)
                         },

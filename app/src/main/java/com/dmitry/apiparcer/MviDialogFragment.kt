@@ -1,6 +1,7 @@
 package com.dmitry.apiparcer
 
 
+import android.app.Activity
 import android.content.Context
 import android.content.res.Configuration
 import android.os.Bundle
@@ -74,10 +75,10 @@ abstract class MviDialogFragment<V : MvpView, P : MviPresenter<V, *>> : DialogFr
         getMvpDelegate().onActivityCreated(savedInstanceState)
     }
 
-//    override fun onAttach(activity: Activity) {
-//        super.onAttach(activity)
-//        getMvpDelegate().onAttach(activity)
-//    }
+    override fun onAttach(activity: Activity) {
+        super.onAttach(activity)
+        getMvpDelegate().onAttach(activity)
+    }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
