@@ -27,6 +27,11 @@ interface AllRepositoriesView : MvpView {
     fun goToDetails(): Observable<Interactor.RepositoryData>
 
     /**
+     * refresh data repository
+     */
+    fun refreshDataRepositories(): Observable<Unit>
+
+    /**
      * render state
      */
     fun render(state: GeneralAllRepositoriesViewState)

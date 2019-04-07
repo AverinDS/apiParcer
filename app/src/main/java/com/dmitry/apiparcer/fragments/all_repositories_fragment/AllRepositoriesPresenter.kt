@@ -18,11 +18,7 @@ class AllRepositoriesPresenter(
     override fun bindIntents() {
 
         val loadingIntent = intent(AllRepositoriesView::loadingIntent)
-            .flatMap { interactor.getRepositoriesDataSinceId(startId) }
-            .observeOn(AndroidSchedulers.mainThread())
-            .map { listRepositories -> PartAllRepositoriesViewState.LoadRepositories(listRepositories) as PartAllRepositoriesViewState }
-            .startWith(PartAllRepositoriesViewState.Loading)
-            .onErrorReturn { PartAllRepositoriesViewState.Error(it.localizedMessage) }
+            .flatMap { getFirstLoadingState() }
 
         val goToUpIntent = intent(AllRepositoriesView::goToUp)
             .map { PartAllRepositoriesViewState.Error("not implemented") as PartAllRepositoriesViewState }
@@ -33,7 +29,11 @@ class AllRepositoriesPresenter(
         val goToDetails = intent(AllRepositoriesView::goToDetails)
             .map { PartAllRepositoriesViewState.GoToDetails(it) as PartAllRepositoriesViewState }
 
-        val allIntents = Observable.merge(listOf(loadingIntent, goToUpIntent, loadNext, goToDetails)).share()
+        val refreshData = intent(AllRepositoriesView::refreshDataRepositories)
+            .flatMap { getFirstLoadingState() }
+
+        val allIntents =
+            Observable.merge(listOf(loadingIntent, goToUpIntent, loadNext, goToDetails, refreshData)).share()
 
         disposables.add(
             allIntents
@@ -46,11 +46,27 @@ class AllRepositoriesPresenter(
             isLoading = true,
             error = "",
             repositoryModels = emptyList(),
-            containsNewData = true
+            containsNewData = true,
+            isRefreshed = false
         )
         val stateObservable: Observable<GeneralAllRepositoriesViewState> =
             allIntents.scan(initialState, this::viewStateReducer)
         subscribeViewState(stateObservable, AllRepositoriesView::render)
+    }
+
+
+    private fun getFirstLoadingState(): Observable<PartAllRepositoriesViewState> {
+        return interactor.getRepositoriesDataSinceId(startId)
+            .observeOn(AndroidSchedulers.mainThread())
+            .map { listRepositories ->
+                PartAllRepositoriesViewState.LoadRepositories(
+                    listRepositories,
+                    true
+                ) as PartAllRepositoriesViewState
+            }
+            .startWith(PartAllRepositoriesViewState.Loading)
+            .onErrorReturn { PartAllRepositoriesViewState.Error(it.localizedMessage) }
+
     }
 
     private fun viewStateReducer(
@@ -63,19 +79,31 @@ class AllRepositoriesPresenter(
                     error = changes.message,
                     isLoading = false,
                     repositoryModels = emptyList(),
-                    containsNewData = false
+                    containsNewData = false,
+                    isRefreshed = false
                 )
             }
             is PartAllRepositoriesViewState.LoadRepositories -> {
                 previousState.copy(
                     error = "",
                     isLoading = false,
-                    repositoryModels = previousState.repositoryModels + changes.repositoryModels,
-                    containsNewData = true
+                    repositoryModels = if (changes.isRefreshed) {
+                        changes.repositoryModels
+                    } else {
+                        previousState.repositoryModels + changes.repositoryModels
+                    },
+                    containsNewData = true,
+                    isRefreshed = changes.isRefreshed
                 )
             }
             is PartAllRepositoriesViewState.Loading -> {
-                previousState.copy(error = "", isLoading = true, repositoryModels = emptyList(), containsNewData = true)
+                previousState.copy(
+                    error = "",
+                    isLoading = true,
+                    repositoryModels = emptyList(),
+                    containsNewData = true,
+                    isRefreshed = false
+                )
             }
             else -> previousState.copy(containsNewData = false)
         }
