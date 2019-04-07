@@ -12,7 +12,7 @@ import com.dmitry.apiparcer.R
 import com.dmitry.apiparcer.adapters.CommitsAdapter
 import com.dmitry.apiparcer.app
 import com.dmitry.apiparcer.repositories.Interactor
-import com.jakewharton.rxbinding2.support.v7.widget.navigationClicks
+import com.jakewharton.rxbinding2.view.clicks
 import com.squareup.picasso.Picasso
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
@@ -49,7 +49,7 @@ class DetailsRepositoryDialogFragment :
         setStyle(DialogFragment.STYLE_NORMAL, R.style.FullScreenDialogStyle)
     }
 
-    override fun closingIntent(): Observable<Unit> = toolbar.navigationClicks()
+    override fun closingIntent(): Observable<Unit> = toolbar.clicks()
 
     override fun loadingIntent(): Observable<Unit> = Observable.just(Unit)
 
@@ -88,7 +88,7 @@ class DetailsRepositoryDialogFragment :
                 repositoryNameText.visibility = View.GONE
             }
             is DetailsRepositoryDialogViewState.Closing -> {
-                onDismiss(null)
+                dismiss()
             }
         }
     }
