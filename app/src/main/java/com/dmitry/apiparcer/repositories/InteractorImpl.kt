@@ -1,10 +1,11 @@
 package com.dmitry.apiparcer.repositories
 
-import android.util.Log
 import com.dmitry.apiparcer.models.RepositoryModel
 import com.google.gson.JsonObject
 import io.reactivex.Observable
 import io.reactivex.functions.Function4
+
+const val REPOSITORIES_SIZE = 15
 
 class InteractorImpl(
     private val networkRepository: NetworkRepository
@@ -13,7 +14,8 @@ class InteractorImpl(
     override fun getRepositoriesDataSinceId(latestRepositoryId: Int): Observable<List<Interactor.RepositoryData>> {
         return networkRepository
             .requestRepositoriesSinceId(latestRepositoryId)
-            .map { it.take(5) }//TODO:DEBUG
+            //api does not support request counts of commit, so it is constraint for better "Time to show" for UI
+            .map { it.take(REPOSITORIES_SIZE) }
             .map { listRepositoryJson ->
                 listRepositoryJson.map { RepositoryModel(it) }
             }
@@ -24,10 +26,6 @@ class InteractorImpl(
                 Observable.zip(requests) { arrayRepositoryData ->
                     arrayRepositoryData.toList().map { it as Interactor.RepositoryData }
                 }
-            }
-            .onErrorReturn { ex ->
-                Log.e(InteractorImpl::class.java.simpleName, ex.message)
-                emptyList()
             }
     }
 
@@ -51,6 +49,7 @@ class InteractorImpl(
             requestStars,
             Function4 { languagesJson, listCommits, listForks, listStarGazers ->
                 RepositoryDataImpl(
+                    id = repositoryModel.id,
                     name = repositoryModel.name,
                     description = repositoryModel.description,
                     forksCount = listForks.count(),
@@ -66,6 +65,7 @@ class InteractorImpl(
     }
 
     data class RepositoryDataImpl(
+        override val id: Int,
         override val name: String,
         override val description: String,
         override val forksCount: Int,

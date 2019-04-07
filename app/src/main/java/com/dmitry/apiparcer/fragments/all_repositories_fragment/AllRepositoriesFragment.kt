@@ -1,6 +1,7 @@
 package com.dmitry.apiparcer.fragments.all_repositories_fragment
 
 import android.os.Bundle
+import android.support.design.widget.Snackbar
 import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.widget.LinearLayoutManager
 import android.view.LayoutInflater
@@ -23,7 +24,6 @@ class AllRepositoriesFragment : MviFragment<AllRepositoriesView, AllRepositories
     lateinit var presenter: AllRepositoriesPresenter
 
     private val loadNextRepositories: PublishSubject<Int> = PublishSubject.create()
-    private val goToUpRepositories: PublishSubject<Unit> = PublishSubject.create()
     private val goToDetails: PublishSubject<Interactor.RepositoryData> = PublishSubject.create()
     private val refreshData: PublishSubject<Unit> = PublishSubject.create()
 
@@ -42,8 +42,6 @@ class AllRepositoriesFragment : MviFragment<AllRepositoriesView, AllRepositories
 
     override fun loadNext(): Observable<Int> = loadNextRepositories
 
-    override fun goToUp(): Observable<Unit> = goToUpRepositories
-
     override fun refreshDataRepositories(): Observable<Unit> = refreshData
 
     override fun render(state: GeneralAllRepositoriesViewState) {
@@ -54,31 +52,38 @@ class AllRepositoriesFragment : MviFragment<AllRepositoriesView, AllRepositories
         }
 
         recycleView.apply {
-            visibility = if (state.isLoading || state.error.isNotEmpty()) {
-                View.GONE
+            visibility = if (state.isLoading || state.errorCode != R.integer.no_errors_code) {
+                View.INVISIBLE
             } else {
                 View.VISIBLE
             }
 
-
             if (adapter == null) {
-                adapter = AllRepositoryAdapter(goToDetails, emptyList())
+                adapter = AllRepositoryAdapter(goToDetails, emptyList(), loadNextRepositories)
                 layoutManager = LinearLayoutManager(this.context)
             } else {
 
-                if (state.containsNewData && !state.isRefreshed) {
+                if (!state.isRefreshed) {
                     (adapter as AllRepositoryAdapter).let {
                         val lastIndex = it.getLastIndex()
-                        val changerange = state.repositoryModels.count() - it.itemCount
                         it.addItems(state.repositoryModels)
-                        it.notifyItemRangeInserted(lastIndex, changerange)
+                        it.notifyItemRangeInserted(lastIndex, state.repositoryModels.count())
                     }
                 }
                 if (state.isRefreshed) {
-                    adapter = AllRepositoryAdapter(goToDetails, state.repositoryModels)
+                    adapter = AllRepositoryAdapter(goToDetails, state.repositoryModels, loadNextRepositories)
                     swipeToRefreshLayout.isRefreshing = false
                 }
             }
+        }
+
+        if (state.errorCode != R.integer.no_errors_code) {
+            swipeToRefreshLayout.isRefreshing = false
+            Snackbar.make(recycleView, getString(state.errorCode), Snackbar.LENGTH_INDEFINITE)
+                .setAction("Ok") {
+                    //hide snackbar only
+                }
+                .show()
         }
     }
 

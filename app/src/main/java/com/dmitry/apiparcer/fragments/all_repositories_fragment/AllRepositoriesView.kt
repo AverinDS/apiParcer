@@ -17,11 +17,6 @@ interface AllRepositoriesView : MvpView {
     fun loadNext(): Observable<Int>
 
     /**
-     * jump to up of the screen
-     */
-    fun goToUp(): Observable<Unit>
-
-    /**
      * open details screen for repository
      */
     fun goToDetails(): Observable<Interactor.RepositoryData>

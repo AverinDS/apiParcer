@@ -1,12 +1,15 @@
 package com.dmitry.apiparcer.fragments.all_repositories_fragment
 
+import android.util.Log
+import com.dmitry.apiparcer.R
 import com.dmitry.apiparcer.repositories.Interactor
 import com.hannesdorfmann.mosby3.mvi.MviBasePresenter
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 
-const val startId = 0
+const val START_ID = 0
+const val LOG_TAG = "AllRepoPresenter"
 
 class AllRepositoriesPresenter(
     private val interactor: Interactor,
@@ -20,11 +23,19 @@ class AllRepositoriesPresenter(
         val loadingIntent = intent(AllRepositoriesView::loadingIntent)
             .flatMap { getFirstLoadingState() }
 
-        val goToUpIntent = intent(AllRepositoriesView::goToUp)
-            .map { PartAllRepositoriesViewState.Error("not implemented") as PartAllRepositoriesViewState }
-
         val loadNext = intent(AllRepositoriesView::loadNext)
-            .map { PartAllRepositoriesViewState.Error("not implemented") as PartAllRepositoriesViewState }
+            .flatMap { lastId -> interactor.getRepositoriesDataSinceId(lastId) }
+            .observeOn(AndroidSchedulers.mainThread())
+            .map { loadedListRepositories ->
+                PartAllRepositoriesViewState.LoadRepositories(
+                    repositoryModels = loadedListRepositories,
+                    isRefreshed = false
+                ) as PartAllRepositoriesViewState
+            }
+            .onErrorReturn {
+                Log.e(LOG_TAG, it.message ?: "Something went wrong")
+                PartAllRepositoriesViewState.Error(R.string.error_message)
+            }
 
         val goToDetails = intent(AllRepositoriesView::goToDetails)
             .map { PartAllRepositoriesViewState.GoToDetails(it) as PartAllRepositoriesViewState }
@@ -33,7 +44,7 @@ class AllRepositoriesPresenter(
             .flatMap { getFirstLoadingState() }
 
         val allIntents =
-            Observable.merge(listOf(loadingIntent, goToUpIntent, loadNext, goToDetails, refreshData)).share()
+            Observable.merge(listOf(loadingIntent, loadNext, goToDetails, refreshData)).share()
 
         disposables.add(
             allIntents
@@ -44,9 +55,8 @@ class AllRepositoriesPresenter(
 
         val initialState = GeneralAllRepositoriesViewState(
             isLoading = true,
-            error = "",
+            errorCode = R.integer.no_errors_code,
             repositoryModels = emptyList(),
-            containsNewData = true,
             isRefreshed = false
         )
         val stateObservable: Observable<GeneralAllRepositoriesViewState> =
@@ -56,7 +66,7 @@ class AllRepositoriesPresenter(
 
 
     private fun getFirstLoadingState(): Observable<PartAllRepositoriesViewState> {
-        return interactor.getRepositoriesDataSinceId(startId)
+        return interactor.getRepositoriesDataSinceId(START_ID)
             .observeOn(AndroidSchedulers.mainThread())
             .map { listRepositories ->
                 PartAllRepositoriesViewState.LoadRepositories(
@@ -65,7 +75,10 @@ class AllRepositoriesPresenter(
                 ) as PartAllRepositoriesViewState
             }
             .startWith(PartAllRepositoriesViewState.Loading)
-            .onErrorReturn { PartAllRepositoriesViewState.Error(it.localizedMessage) }
+            .onErrorReturn {
+                Log.e(LOG_TAG, it.message ?: "Something went wrong")
+                PartAllRepositoriesViewState.Error(R.string.error_message)
+            }
 
     }
 
@@ -76,36 +89,29 @@ class AllRepositoriesPresenter(
         return when (changes) {
             is PartAllRepositoriesViewState.Error -> {
                 previousState.copy(
-                    error = changes.message,
+                    errorCode = changes.messageCode,
                     isLoading = false,
                     repositoryModels = emptyList(),
-                    containsNewData = false,
                     isRefreshed = false
                 )
             }
             is PartAllRepositoriesViewState.LoadRepositories -> {
                 previousState.copy(
-                    error = "",
+                    errorCode = R.integer.no_errors_code,
                     isLoading = false,
-                    repositoryModels = if (changes.isRefreshed) {
-                        changes.repositoryModels
-                    } else {
-                        previousState.repositoryModels + changes.repositoryModels
-                    },
-                    containsNewData = true,
+                    repositoryModels = changes.repositoryModels,
                     isRefreshed = changes.isRefreshed
                 )
             }
             is PartAllRepositoriesViewState.Loading -> {
                 previousState.copy(
-                    error = "",
+                    errorCode = R.integer.no_errors_code,
                     isLoading = true,
                     repositoryModels = emptyList(),
-                    containsNewData = true,
                     isRefreshed = false
                 )
             }
-            else -> previousState.copy(containsNewData = false)
+            else -> previousState.copy(isRefreshed = false)
         }
     }
 

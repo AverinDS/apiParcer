@@ -13,7 +13,8 @@ import kotlinx.android.synthetic.main.item_repository.view.*
 
 class AllRepositoryAdapter(
     private val goToDetails: PublishSubject<Interactor.RepositoryData>,
-    private var listRepositories: List<Interactor.RepositoryData>
+    private var listRepositories: List<Interactor.RepositoryData>,
+    private val loadNextRepositories: PublishSubject<Int>
 ) :
     RecyclerView.Adapter<AllRepositoryAdapter.ViewHolder>() {
 
@@ -40,6 +41,11 @@ class AllRepositoryAdapter(
                 Picasso.get().load(url).into(holder.iconAvatar)
             }
         }
+        holder.progressbar.visibility = if (position == listRepositories.lastIndex) {
+            View.VISIBLE
+        } else {
+            View.GONE
+        }
     }
 
     override fun getItemCount(): Int = listRepositories.size
@@ -60,6 +66,9 @@ class AllRepositoryAdapter(
         holder.bodyItem.setOnLongClickListener {
             goToDetails.onNext(listRepositories[holder.adapterPosition])
             true
+        }
+        if (holder.adapterPosition == listRepositories.lastIndex) {
+            loadNextRepositories.onNext(listRepositories.last().id)
         }
     }
 
@@ -104,5 +113,6 @@ class AllRepositoryAdapter(
         val commitsText = itemView.commitsText
         val descriptionText = itemView.descriptionText
         val languageText = itemView.languageText
+        val progressbar = itemView.progressBarItem
     }
 }

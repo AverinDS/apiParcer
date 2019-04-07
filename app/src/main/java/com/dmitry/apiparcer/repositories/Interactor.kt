@@ -6,6 +6,7 @@ interface Interactor {
     fun getRepositoriesDataSinceId(latestRepositoryId: Int): Observable<List<RepositoryData>>
 
     interface RepositoryData {
+        val id: Int
         val name: String
         val description: String
         val forksCount: Int
