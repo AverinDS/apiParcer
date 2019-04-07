@@ -8,6 +8,7 @@
 	<string name="description_template">Description:\n %s</string>
 	<string name="commits_count_template">Commits: %d\n</string>
 	<string name="languages_template">Languages:\n%s</string>
+	<string name="ok">OK</string>
 
 	<string name="error_message">Something went wrong due loading</string>
 </resources>

@@ -78,8 +78,8 @@ class AllRepositoryAdapter(
         holder.bodyItem.setOnLongClickListener(null)
     }
 
-    fun addItems(newItems: List<Interactor.RepositoryData>) {
-        listRepositories += newItems
+    fun setItems(newItems: List<Interactor.RepositoryData>) {
+        listRepositories = newItems
     }
 
     fun getLastIndex(): Int {

@@ -10,6 +10,7 @@ sealed class PartAllRepositoriesViewState {
     data class Error(val messageCode: Int) : PartAllRepositoriesViewState()
     data class GoToDetails(val repositoryData: Interactor.RepositoryData) : PartAllRepositoriesViewState()
     object Loading : PartAllRepositoriesViewState()
+    object EmptyState : PartAllRepositoriesViewState()
 }
 
 data class GeneralAllRepositoriesViewState(

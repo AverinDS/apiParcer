@@ -32,8 +32,8 @@ class AllRepositoriesFragment : MviFragment<AllRepositoriesView, AllRepositories
     }
 
     override fun onStart() {
-        swipeToRefreshLayout.setOnRefreshListener(this)
         super.onStart()
+        swipeToRefreshLayout.setOnRefreshListener(this)
     }
 
     override fun loadingIntent(): Observable<Unit> = Observable.merge(Observable.just(Unit), refreshData)
@@ -52,7 +52,7 @@ class AllRepositoriesFragment : MviFragment<AllRepositoriesView, AllRepositories
         }
 
         recycleView.apply {
-            visibility = if (state.isLoading || state.errorCode != R.integer.no_errors_code) {
+            visibility = if (state.isLoading) {
                 View.INVISIBLE
             } else {
                 View.VISIBLE
@@ -62,17 +62,18 @@ class AllRepositoriesFragment : MviFragment<AllRepositoriesView, AllRepositories
                 adapter = AllRepositoryAdapter(goToDetails, emptyList(), loadNextRepositories)
                 layoutManager = LinearLayoutManager(this.context)
             } else {
-
-                if (!state.isRefreshed) {
-                    (adapter as AllRepositoryAdapter).let {
-                        val lastIndex = it.getLastIndex()
-                        it.addItems(state.repositoryModels)
-                        it.notifyItemRangeInserted(lastIndex, state.repositoryModels.count())
+                if (state.errorCode == R.integer.no_errors_code) {
+                    if (!state.isRefreshed) {
+                        (adapter as AllRepositoryAdapter).let {
+                            val currentLastIndex = it.getLastIndex()
+                            val rangeInserting = state.repositoryModels.lastIndex - currentLastIndex
+                            it.setItems(state.repositoryModels)
+                            it.notifyItemRangeInserted(currentLastIndex, rangeInserting)
+                        }
+                    } else {
+                        adapter = AllRepositoryAdapter(goToDetails, state.repositoryModels, loadNextRepositories)
+                        swipeToRefreshLayout.isRefreshing = false
                     }
-                }
-                if (state.isRefreshed) {
-                    adapter = AllRepositoryAdapter(goToDetails, state.repositoryModels, loadNextRepositories)
-                    swipeToRefreshLayout.isRefreshing = false
                 }
             }
         }
@@ -80,7 +81,7 @@ class AllRepositoriesFragment : MviFragment<AllRepositoriesView, AllRepositories
         if (state.errorCode != R.integer.no_errors_code) {
             swipeToRefreshLayout.isRefreshing = false
             Snackbar.make(recycleView, getString(state.errorCode), Snackbar.LENGTH_INDEFINITE)
-                .setAction("Ok") {
+                .setAction(getString(R.string.ok)) {
                     //hide snackbar only
                 }
                 .show()

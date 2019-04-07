@@ -17,15 +17,23 @@ class AllRepositoriesPresenter(
 ) : MviBasePresenter<AllRepositoriesView, GeneralAllRepositoriesViewState>() {
 
     private val disposables = CompositeDisposable()
+    private var isFirstState = true
+
 
     override fun bindIntents() {
 
         val loadingIntent = intent(AllRepositoriesView::loadingIntent)
-            .flatMap { getFirstLoadingState() }
+            .flatMap { getInitialState() }
+            .doOnNext { this.isFirstState = false }
+            .onErrorReturn {
+                Log.e(LOG_TAG, it.message ?: "Something went wrong")
+                PartAllRepositoriesViewState.Error(R.string.error_message)
+            }
 
         val loadNext = intent(AllRepositoriesView::loadNext)
             .flatMap { lastId -> interactor.getRepositoriesDataSinceId(lastId) }
             .observeOn(AndroidSchedulers.mainThread())
+
             .map { loadedListRepositories ->
                 PartAllRepositoriesViewState.LoadRepositories(
                     repositoryModels = loadedListRepositories,
@@ -37,6 +45,7 @@ class AllRepositoriesPresenter(
                 PartAllRepositoriesViewState.Error(R.string.error_message)
             }
 
+
         val goToDetails = intent(AllRepositoriesView::goToDetails)
             .map { PartAllRepositoriesViewState.GoToDetails(it) as PartAllRepositoriesViewState }
 
@@ -44,7 +53,9 @@ class AllRepositoriesPresenter(
             .flatMap { getFirstLoadingState() }
 
         val allIntents =
-            Observable.merge(listOf(loadingIntent, loadNext, goToDetails, refreshData)).share()
+            Observable.merge(listOf(loadingIntent, loadNext, goToDetails, refreshData))
+                .share()
+
 
         disposables.add(
             allIntents
@@ -64,6 +75,13 @@ class AllRepositoriesPresenter(
         subscribeViewState(stateObservable, AllRepositoriesView::render)
     }
 
+    private fun getInitialState(): Observable<PartAllRepositoriesViewState> {
+        return if (isFirstState) {
+            getFirstLoadingState()
+        } else {
+            Observable.just(PartAllRepositoriesViewState.EmptyState)
+        }
+    }
 
     private fun getFirstLoadingState(): Observable<PartAllRepositoriesViewState> {
         return interactor.getRepositoriesDataSinceId(START_ID)
@@ -91,7 +109,6 @@ class AllRepositoriesPresenter(
                 previousState.copy(
                     errorCode = changes.messageCode,
                     isLoading = false,
-                    repositoryModels = emptyList(),
                     isRefreshed = false
                 )
             }
@@ -99,7 +116,7 @@ class AllRepositoriesPresenter(
                 previousState.copy(
                     errorCode = R.integer.no_errors_code,
                     isLoading = false,
-                    repositoryModels = changes.repositoryModels,
+                    repositoryModels = previousState.repositoryModels + changes.repositoryModels,
                     isRefreshed = changes.isRefreshed
                 )
             }
@@ -107,11 +124,12 @@ class AllRepositoriesPresenter(
                 previousState.copy(
                     errorCode = R.integer.no_errors_code,
                     isLoading = true,
-                    repositoryModels = emptyList(),
                     isRefreshed = false
                 )
             }
-            else -> previousState.copy(isRefreshed = false)
+            else -> {
+                previousState.copy(isRefreshed = false)
+            }
         }
     }
 

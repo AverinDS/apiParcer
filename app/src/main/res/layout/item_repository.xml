@@ -57,6 +57,7 @@
 		android:layout_height="@dimen/rv_item_avatar_size"
 		android:layout_marginStart="@dimen/rv_item_borders"
 		android:layout_marginTop="@dimen/rv_item_avatar_padding_up"
+		android:background="@drawable/ic_person_black_40dp"
 		android:contentDescription="@string/avatar_description"
 		app:layout_constraintStart_toStartOf="parent"
 		app:layout_constraintTop_toTopOf="parent"
